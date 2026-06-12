@@ -9533,7 +9533,7 @@ function loadInitialState(){
     const embeddedPeople=Array.isArray(seeded.people)?seeded.people:[];
     seeded._embeddedSeedVersion=EMBEDDED_SEED_VERSION||seeded._embeddedSeedVersion||'embedded';
     seeded._embeddedProfileIds=embeddedPeople.map(p=>p&&p.id).filter(Boolean);
-    seeded.tab=seeded.tab||'leaderboard';
+    seeded.tab='leaderboard';
     seeded.advancedOpen=true;
     return seeded;
   }
