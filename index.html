@@ -11582,7 +11582,12 @@ async function loadRemoteData(show){
       } else if(show)messages.push('results not loaded: '+e.message);
     }
   }
-  if(changed){save(); render();}
+  if(changed){
+  state.tab='leaderboard';
+  state.reveal={match:latestEnteredMatch()};
+  save();
+  render();
+  }
   if(show){
     if(messages.length)alert(messages.join('\n'));
     else if(!attempted)alert('No live-data URLs are set. Nothing was refreshed. Use Import Real Results CSV / Import Brackets CSV, or paste working published URLs first.');
