@@ -9539,7 +9539,7 @@ function loadInitialState(){
   }
   return defaults();
 }
-let state=loadInitialState(); normalize();
+let state=loadInitialState(); normalize(); state.tab='leaderboard'; state.reveal={match:latestEnteredMatch()};
 function normalize(){if(!['en','es'].includes(state.lang))state.lang='en'; if(!Array.isArray(state.people))state.people=[]; if(!state.actual)state.actual=blankActual(); state.scoring=normalizeScoringSnapshot({...TOURNAMENT.scoring,...(state.scoring||{})}); if(!state.options)state.options={}; state.options={fillKnockoutGoals:false,treeZoom:.6,...state.options}; if(![1,.85,.7,.6].includes(+state.options.treeZoom))state.options.treeZoom=.6; if(!state.remote)state.remote={playersUrl:'',resultsUrl:'',autoLoad:0}; state.remote={playersUrl:'',resultsUrl:'',autoLoad:0,...state.remote}; if(state.remote.playersUrl==='./players.json')state.remote.playersUrl=''; if(state.remote.resultsUrl==='./results.csv')state.remote.resultsUrl=''; if(state.reveal && state.reveal.index!=null && state.reveal.match==null)state.reveal.match=104; if(!state.reveal)state.reveal={match:104}; TOURNAMENT.matches.forEach(m=>{ if(!state.actual[m.matchNumber]) state.actual[m.matchNumber]={s1:null,s2:null,winner:null}; state.people.forEach(p=>{ if(!p.picks)p.picks=blankPicks(); if(!p.picks[m.matchNumber])p.picks[m.matchNumber]={s1:null,s2:null,winner:null}; });}); if(!state.people.length)state.people.push({id:id(),name:'Player 1',locked:false,picks:blankPicks()});}
 function save(){
   // Keep changes only in memory. Exporting writes the current state into the new HTML file.
