@@ -11666,6 +11666,7 @@ function buildCompleteEmbeddedState(){
   seeded.remote={playersUrl:'',resultsUrl:'',autoLoad:0,...(seeded.remote||{})};
   if(seeded.remote.resultsUrl)seeded.remote.autoLoad=1;
   seeded.tab='leaderboard';
+  seeded.reveal={match:latestEnteredMatch()};
   seeded.advancedOpen=true;
   seeded.selectedPerson=(seeded.people||[]).some(p=>p.id===seeded.selectedPerson)?seeded.selectedPerson:((seeded.people||[])[0]||{}).id;
   seeded._embeddedSeedVersion='seed_complete_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
