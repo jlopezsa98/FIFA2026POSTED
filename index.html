@@ -1,6 +1,15 @@
 
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="fifa-state-source" content="embedded-html-only"><meta name="fifa-browser-storage" content="disabled"><meta name="fifa-app-build" content="2026-06-11-no-browser-storage-1"><title>FIFA Bracket 2026</title>
+<script>
+(function(){
+  var ua=navigator.userAgent||'';
+  var android=/Android/i.test(ua);
+  var mobile=android||/iPhone|iPad|iPod|Mobile/i.test(ua);
+  if(android)document.documentElement.classList.add('android-device');
+  if(mobile)document.documentElement.classList.add('mobile-device');
+})();
+</script>
 <style>
 :root{
   --bg:#f7fbff;
@@ -2080,6 +2089,196 @@ button.tree-pick-team:hover{
   .results-subnav > button{
     font-size:10.5px !important;
     padding-inline:3px !important;
+  }
+}
+
+
+/* Leaderboard phone corrections */
+.current-score-centre{text-align:center}
+.current-match-meta{text-align:center}
+.current-team-two{justify-content:flex-end}
+
+@media(max-width:700px){
+  .current-match{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) !important;
+    grid-template-areas:
+      "team1 score team2"
+      "meta meta meta";
+    align-items:center !important;
+    column-gap:8px !important;
+    row-gap:8px !important;
+    text-align:initial !important;
+  }
+
+  .current-match .current-team-one{
+    grid-area:team1;
+    justify-content:flex-start !important;
+    text-align:left;
+  }
+
+  .current-match .current-team-two{
+    grid-area:team2;
+    justify-content:flex-end !important;
+    text-align:right;
+  }
+
+  .current-score-centre{
+    display:contents;
+  }
+
+  .current-score-centre .scorebig{
+    grid-area:score;
+    align-self:center;
+    justify-self:center;
+    white-space:nowrap;
+    font-size:25px !important;
+  }
+
+  .current-score-centre .current-match-meta{
+    grid-area:meta;
+    width:100%;
+    text-align:center !important;
+  }
+
+  .current-match .sideTeam{
+    min-width:0;
+    line-height:1.15;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+
+  .leaderboard-table .leader-group-score{
+    white-space:nowrap;
+    text-align:center;
+    font-size:16px;
+    font-weight:900;
+  }
+
+  .leaderboard-table th:nth-child(3){
+    text-align:center;
+    white-space:nowrap;
+  }
+}
+
+@media(max-width:430px){
+  .current-match{
+    grid-template-columns:minmax(0,1fr) 68px minmax(0,1fr) !important;
+    padding:10px !important;
+  }
+
+  .current-match .sideTeam{
+    gap:5px !important;
+    font-size:13px;
+  }
+
+  .current-score-centre .scorebig{
+    font-size:23px !important;
+  }
+}
+
+
+/* Android and lower-powered mobile performance mode */
+@media(max-width:850px){
+  html.android-device{
+    scroll-behavior:auto !important;
+  }
+
+  html.android-device body,
+  html.android-device body:before{
+    background-image:none !important;
+  }
+
+  html.android-device body{
+    background:#f4f1eb !important;
+  }
+
+  html.android-device body:before{
+    display:none !important;
+    content:none !important;
+  }
+
+  html.android-device .side,
+  html.android-device .nav,
+  html.android-device .top,
+  html.android-device .card,
+  html.android-device .brand,
+  html.android-device .settings-help-button{
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+
+  html.android-device .brand,
+  html.android-device .top,
+  html.android-device .card,
+  html.android-device .tablewrap,
+  html.android-device .current-match,
+  html.android-device .results-subnav-card,
+  html.android-device .side{
+    box-shadow:0 3px 10px rgba(0,0,0,.10) !important;
+  }
+
+  html.android-device .top:before,
+  html.android-device .card:before{
+    opacity:.45 !important;
+  }
+
+  html.android-device .top,
+  html.android-device .card,
+  html.android-device .brand{
+    background-image:none !important;
+  }
+
+  html.android-device .logo{
+    box-shadow:none !important;
+  }
+
+  html.android-device button,
+  html.android-device input,
+  html.android-device select,
+  html.android-device textarea,
+  html.android-device .match-sort-thumb{
+    transition:none !important;
+    animation:none !important;
+  }
+
+  html.android-device button:hover{
+    transform:none !important;
+    box-shadow:none !important;
+  }
+
+  html.android-device .player-color-row td{
+    background-image:none !important;
+  }
+
+  html.android-device .leaderboard-tablewrap{
+    max-height:none !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  html.android-device .leaderboard-table{
+    contain:layout style;
+  }
+
+  html.android-device .fifa-watermark,
+  html.android-device [style*="var(--fifa-logo)"]{
+    background-image:none !important;
+  }
+}
+
+/* Reduce expensive effects for all phones, not only Android */
+@media(max-width:700px){
+  .side,
+  .nav,
+  .top,
+  .card{
+    -webkit-backdrop-filter:none !important;
+    backdrop-filter:none !important;
+  }
+
+  *{
+    text-rendering:optimizeSpeed;
   }
 }
 
@@ -9859,6 +10058,30 @@ function id(){return 'id_'+Date.now().toString(36)+'_'+Math.random().toString(36
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 const teamById = Object.fromEntries(TOURNAMENT.teams.map(t=>[t.id,t]));
 const matchByNo = Object.fromEntries(TOURNAMENT.matches.map(m=>[m.matchNumber,m]));
+
+/*
+  The leaderboard moves through matches chronologically, but every visible
+  match number and every prediction/result key remains FIFA's original number.
+*/
+function leaderboardKickoffValue(match){
+  const parsed=Date.parse(match&&match.dateText||'');
+  return Number.isFinite(parsed)?parsed:Number.MAX_SAFE_INTEGER;
+}
+const LEADERBOARD_MATCHES=[...TOURNAMENT.matches].sort((a,b)=>
+  leaderboardKickoffValue(a)-leaderboardKickoffValue(b) ||
+  a.matchNumber-b.matchNumber
+);
+const leaderboardMatchByPosition=Object.fromEntries(
+  LEADERBOARD_MATCHES.map((match,index)=>[index+1,match])
+);
+const leaderboardPositionByMatchNumber=Object.fromEntries(
+  LEADERBOARD_MATCHES.map((match,index)=>[match.matchNumber,index+1])
+);
+function leaderboardPositionForMatch(match){
+  return match&&leaderboardPositionByMatchNumber[match.matchNumber]
+    ? leaderboardPositionByMatchNumber[match.matchNumber]
+    : 104;
+}
 function blankPicks(){let o={}; TOURNAMENT.matches.forEach(m=>o[m.matchNumber]={s1:null,s2:null,winner:null}); return o}
 function blankActual(){let o={}; TOURNAMENT.matches.forEach(m=>o[m.matchNumber]={s1:m.actualScore1,s2:m.actualScore2,winner:null}); return o}
 function defaultScoring(){return {correctResult:10,correctGoalDifference:5,exactScore:5,exactScoreStacks:1,enableHighScoringBonus:1,highScoringGoalTotal:5,highScoringTolerance:1,highScoringBonus:3,correctKnockoutWinner:10,alternatePathCredit:5,knockoutScoringMode:'hybrid',roundOf32Bonus:0,roundOf16Bonus:2,quarterfinalBonus:5,semifinalBonus:8,thirdPlaceBonus:5,finalWinnerBonus:12,enableKnockoutScoreBonuses:0,knockoutExactScore:6,knockoutGoalDifference:3,enableChampionBonus:1,championBonus:30,enableRunnerUpBonus:1,runnerUpBonus:10}}
@@ -9984,10 +10207,10 @@ function sideWinnerByScores(o){ if(!o)return null; if(o.s1==null||o.s2==null||o.
 function actualWinnerTeamID(m){ const w=resultWinner(m,'actual'); if(!w)return null; const ref=w==='team1'?m.team1Ref:m.team2Ref; const t=resolveRef(ref,'actual'); return t?t.id:null; }
 function pickedWinnerTeamID(m,p){ const w=resultWinner(m,p.id); if(!w)return null; const ref=w==='team1'?m.team1Ref:m.team2Ref; const t=resolveRef(ref,p.id); return t?t.id:null; }
 function actualRunnerUpTeamID(m){ const w=resultWinner(m,'actual'); if(!w)return null; const ref=w==='team1'?m.team2Ref:m.team1Ref; const t=resolveRef(ref,'actual'); return t?t.id:null; }
-function actualAdvancingTeamIDs(stage,limit=104){return new Set(TOURNAMENT.matches.filter(m=>m.stage===stage&&m.matchNumber<=limit).map(actualWinnerTeamID).filter(Boolean))}
+function actualAdvancingTeamIDs(stage,limit=104){return new Set(TOURNAMENT.matches.filter(m=>m.stage===stage&&leaderboardPositionForMatch(m)<=limit).map(actualWinnerTeamID).filter(Boolean))}
 function stageBonus(stage){const s=state.scoring; return ({roundOf32:s.roundOf32Bonus||0,roundOf16:s.roundOf16Bonus||0,quarterfinal:s.quarterfinalBonus||0,semifinal:s.semifinalBonus||0,thirdPlace:s.thirdPlaceBonus||0,final:s.finalWinnerBonus||0})[stage]||0}
 function championPickID(p){ const final=matchByNo[104]||TOURNAMENT.matches.find(m=>m.stage==='final'); return final?pickedWinnerTeamID(final,p):null; }
-function calcPoints(p,limit=104){let total=0,groupPoints=0,knockoutPoints=0,detail={}; const s=state.scoring; TOURNAMENT.matches.forEach(m=>{let pts=0; if(m.matchNumber>limit){detail[m.matchNumber]=0;return} let a=state.actual[m.matchNumber],x=p.picks[m.matchNumber]||{}; if(a.s1==null||a.s2==null||a.s1===''||a.s2===''){detail[m.matchNumber]=0;return} let as1=+a.s1,as2=+a.s2; if(!Number.isFinite(as1)||!Number.isFinite(as2)){detail[m.matchNumber]=0;return}
+function calcPoints(p,limit=104){let total=0,groupPoints=0,knockoutPoints=0,detail={}; const s=state.scoring; TOURNAMENT.matches.forEach(m=>{let pts=0; if(leaderboardPositionForMatch(m)>limit){detail[m.matchNumber]=0;return} let a=state.actual[m.matchNumber],x=p.picks[m.matchNumber]||{}; if(a.s1==null||a.s2==null||a.s1===''||a.s2===''){detail[m.matchNumber]=0;return} let as1=+a.s1,as2=+a.s2; if(!Number.isFinite(as1)||!Number.isFinite(as2)){detail[m.matchNumber]=0;return}
 if(m.stage==='group'){ if(x.s1==null||x.s2==null||x.s1===''||x.s2===''){detail[m.matchNumber]=0;return} let ps1=+x.s1,ps2=+x.s2; if(!Number.isFinite(ps1)||!Number.isFinite(ps2)){detail[m.matchNumber]=0;return} const ar=as1===as2?'D':as1>as2?'1':'2'; const pr=ps1===ps2?'D':ps1>ps2?'1':'2'; const exact=as1===ps1&&as2===ps2; if(exact && !truthy(s.exactScoreStacks)){pts+=s.exactScore||0}else{ if(ar===pr)pts+=s.correctResult||0; if((as1-as2)===(ps1-ps2))pts+=s.correctGoalDifference||0; if(exact)pts+=s.exactScore||0; } if(truthy(s.enableHighScoringBonus) && as1+as2 >= (s.highScoringGoalTotal||5) && Math.abs((ps1+ps2)-(as1+as2)) <= (s.highScoringTolerance||0)) pts+=s.highScoringBonus||0; groupPoints+=pts;}
 else{ const actualID=actualWinnerTeamID(m); const pickedID=pickedWinnerTeamID(m,p); if(actualID&&pickedID){ const exact=pickedID===actualID; const advanced=actualAdvancingTeamIDs(m.stage,limit).has(pickedID); const bonus=stageBonus(m.stage); const mode=s.knockoutScoringMode||'hybrid'; if(mode==='strictMatchPath'){ if(exact)pts+=(s.correctKnockoutWinner||0)+bonus; } else if(mode==='roundReached'){ if(advanced)pts+=(s.correctKnockoutWinner||0)+bonus; } else { if(exact)pts+=(s.correctKnockoutWinner||0)+bonus; else if(m.stage!=='final'&&advanced)pts+=(s.alternatePathCredit||0)+bonus; } const hasPredScores=x.s1!=null&&x.s2!=null&&x.s1!==''&&x.s2!==''&&Number.isFinite(+x.s1)&&Number.isFinite(+x.s2); if(exact&&hasPredScores&&truthy(s.enableKnockoutScoreBonuses)){ let ps1=+x.s1,ps2=+x.s2; if(as1===ps1&&as2===ps2)pts+=s.knockoutExactScore||0; else if((as1-as2)===(ps1-ps2))pts+=s.knockoutGoalDifference||0; } if(m.stage==='final'){ const champ=championPickID(p); if(truthy(s.enableChampionBonus)&&champ===actualID)pts+=s.championBonus||0; if(truthy(s.enableRunnerUpBonus)&&champ===actualRunnerUpTeamID(m))pts+=s.runnerUpBonus||0; }} knockoutPoints+=pts;}
 detail[m.matchNumber]=pts; total+=pts; }); return {total,groupPoints,knockoutPoints,detail};}
@@ -11009,12 +11232,12 @@ function standings(){let groupHtml=allGroupStandings('actual').map(g=>`<div clas
 function standTable(rows,third=false,qualifiedGroups=null,slotByGroup={}){return `<div class="tablewrap"><table><thead><tr><th>#</th><th>Team</th>${third?'<th>Group</th><th>Status</th><th>R32 slot</th>':''}<th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead><tbody>${rows.map((r,i)=>{const q=third&&qualifiedGroups&&qualifiedGroups.has(r.groupID); return `<tr><td>${i+1}</td><td><div class="team"><span class="flag">${flag(r.name)}</span>${esc(r.name)}</div></td>${third?`<td>${r.groupID}</td><td>${q?'<span class="pill" style="color:var(--good)">Qualified</span>':(i<8?'<span class="pill">Provisional top 8</span>':'<span class="pill">Out</span>')}</td><td>${esc(slotByGroup[r.groupID]||'')}</td>`:''}<td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf}</td><td>${r.ga}</td><td>${r.gd}</td><td><b>${r.pts}</b></td></tr>`}).join('')}</tbody></table></div>`}
 function ranked(limit=104){return visiblePeople().map(p=>({name:p.name,id:p.id,...calcPoints(p,limit)})).sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name))}
 function latestEnteredMatch(){
-  var mx=1;
-  TOURNAMENT.matches.forEach(function(m){
-    var a=state.actual[m.matchNumber];
-    if(isScoreEntered(a)) mx=Math.max(mx,m.matchNumber);
+  var latestPosition=1;
+  LEADERBOARD_MATCHES.forEach(function(match,index){
+    var actual=state.actual[match.matchNumber];
+    if(isScoreEntered(actual)) latestPosition=Math.max(latestPosition,index+1);
   });
-  return mx;
+  return latestPosition;
 }
 function clampMatchNo(v){
   v=Number(v);
@@ -11038,6 +11261,37 @@ function knockoutOutcomeText(stage,w,loser){
   if(stage==='semifinal')return `${w} to final, ${loser} to third-place`;
   return `${w} wins, ${loser} eliminated`;
 }
+const TEAM_ABBREVIATIONS={
+  'Mexico':'MEX','South Africa':'RSA','Rep. of Korea':'KOR','Czech Rep.':'CZE',
+  'Canada':'CAN','Bosnia/Herzeg.':'BIH','Qatar':'QAT','Switzerland':'SUI',
+  'Brazil':'BRA','Morocco':'MAR','Haiti':'HAI','Scotland':'SCO',
+  'USA':'USA','Paraguay':'PAR','Australia':'AUS','Turkey':'TUR',
+  'Germany':'GER','Curaçao':'CUW','Ivory Coast':'CIV','Ecuador':'ECU',
+  'Netherlands':'NED','Japan':'JPN','Sweden':'SWE','Tunisia':'TUN',
+  'Belgium':'BEL','Egypt':'EGY','IR Iran':'IRN','New Zealand':'NZL',
+  'Spain':'ESP','Cape Verde':'CPV','Saudi Arabia':'KSA','Uruguay':'URU',
+  'France':'FRA','Senegal':'SEN','Iraq':'IRQ','Norway':'NOR',
+  'Argentina':'ARG','Algeria':'ALG','Austria':'AUT','Jordan':'JOR',
+  'Portugal':'POR','DR Congo':'COD','Uzbekistan':'UZB','Colombia':'COL',
+  'England':'ENG','Croatia':'CRO','Ghana':'GHA','Panama':'PAN'
+};
+function teamAbbreviation(name){
+  const clean=String(name||'').trim();
+  return TEAM_ABBREVIATIONS[clean] ||
+    clean.replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase() ||
+    'TBD';
+}
+function leaderboardPredictionForMatch(match,person){
+  if(!match||!person)return trText('No prediction');
+  if(match.stage!=='group')return predictionForMatch(match,person);
+  const pick=(person.picks&&person.picks[match.matchNumber])||{};
+  const hasScores=
+    pick.s1!=null&&pick.s2!=null&&
+    pick.s1!==''&&pick.s2!==''&&
+    Number.isFinite(+pick.s1)&&Number.isFinite(+pick.s2);
+  return hasScores?`${pick.s1} - ${pick.s2}`:trText('No prediction');
+}
+
 function predictionForMatch(m,p){
   if(!m||!p)return trText('No prediction');
 
@@ -11178,21 +11432,60 @@ function leaderboard(){
   return `<div class="card"><div class="row"><button type="button" data-action="reveal-reset">${trText('Match 1')}</button><button type="button" data-action="reveal-prev">${trText('Previous')}</button><input id="leaderSlider" type="range" min="1" max="104" value="${lim}" data-reveal-match style="flex:1;min-width:260px"><button type="button" class="primary" data-action="reveal-next">${trText('Next')}</button><button type="button" data-action="reveal-live">${trText('Current Match')}</button><span id="leaderPill" class="pill">${trText('Through match')} ${lim}/104</span></div></div><div id="leader-dynamic">${leaderDynamic(lim)}</div>`;
 }
 function leaderDynamic(rawLim){
-  let lim=clampMatchNo(rawLim);
-  let r=ranked(lim);
-  let current=matchByNo[lim];
-  let a=current?state.actual[current.matchNumber]:null;
-  let n1=current?teamName(current.team1Ref,'actual'):'';
-  let n2=current?teamName(current.team2Ref,'actual'):'';
-  let w=current?winnerName(current,'actual'):'';
-  let score=isScoreEntered(a)?`${a.s1} - ${a.s2}`:'No result entered yet';
-  const rows=r.map((p,i)=>{
-    const person=state.people.find(x=>x.id===p.id);
-    const matchPts=(p.detail&&p.detail[lim])||0;
+  const position=clampMatchNo(rawLim);
+  const rankedPeople=ranked(position);
+  const current=leaderboardMatchByPosition[position];
+  const originalMatchNo=current?current.matchNumber:position;
+  const actual=current?state.actual[originalMatchNo]:null;
+  const team1=current?teamName(current.team1Ref,'actual'):'';
+  const team2=current?teamName(current.team2Ref,'actual'):'';
+  const winner=current?winnerName(current,'actual'):'';
+  const score=isScoreEntered(actual)?`${actual.s1} - ${actual.s2}`:'No result entered yet';
+  const isGroup=!!(current&&current.stage==='group');
+  const predictionHeader=isGroup
+    ? `${teamAbbreviation(team1)} vs ${teamAbbreviation(team2)}`
+    : `${trText('Prediction for')} #${originalMatchNo}`;
+
+  const rows=rankedPeople.map((personPoints,index)=>{
+    const person=state.people.find(item=>item.id===personPoints.id);
+    const matchPoints=(personPoints.detail&&personPoints.detail[originalMatchNo])||0;
     const style=playerCellStyle(person);
-    return `<tr class="player-color-row" style="${playerColorVars(person)}"><td style="${style}">${i+1}</td><td class="player-color-name" style="${style}">${esc(p.name)}</td><td style="${style}">${esc(predictionForMatch(current,person))}</td><td style="${style}"><b>${matchPts}</b></td><td style="${style}"><b>${p.total}</b></td><td style="${style}">${esc((teamById[championPickID(person)]&&teamById[championPickID(person)].name)||'None')}</td></tr>`;
+    return `<tr class="player-color-row" style="${playerColorVars(person)}">
+      <td style="${style}">${index+1}</td>
+      <td class="player-color-name" style="${style}">${esc(personPoints.name)}</td>
+      <td class="leader-prediction-cell ${isGroup?'leader-group-score':''}" style="${style}">${esc(leaderboardPredictionForMatch(current,person))}</td>
+      <td style="${style}"><b>${matchPoints}</b></td>
+      <td style="${style}"><b>${personPoints.total}</b></td>
+      <td style="${style}">${esc((teamById[championPickID(person)]&&teamById[championPickID(person)].name)||'None')}</td>
+    </tr>`;
   }).join('');
-  return `<div class="card"><div class="current-match"><div class="sideTeam"><span class="flag">${flag(n1)}</span>${esc(n1)}</div><div><div class="scorebig">${esc(score)}</div><div class="tiny mut" style="text-align:center">#${lim} · ${esc(STAGE_LABEL[current&&current.stage]||'')} ${w?`· Winner: ${esc(w)}`:''}</div></div><div class="sideTeam" style="justify-content:flex-end">${esc(n2)}<span class="flag">${flag(n2)}</span></div></div><div class="tiny mut" style="margin-top:8px">The table below shows each player's accumulated score through this selected match, plus what they predicted for the selected match and how many points that match is currently earning them.</div></div><div class="card" style="margin-top:16px"><div class="tablewrap"><table><thead><tr><th>Rank</th><th>Name</th><th>Prediction for #${lim}</th><th>Points This Match</th><th>Total Through #${lim}<th>Champion Pick</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+
+  return `<div class="card">
+    <div class="current-match">
+      <div class="sideTeam current-team-one"><span class="flag">${flag(team1)}</span><span>${esc(team1)}</span></div>
+      <div class="current-score-centre">
+        <div class="scorebig">${esc(score)}</div>
+        <div class="tiny mut current-match-meta">#${originalMatchNo} · ${esc(STAGE_LABEL[current&&current.stage]||'')} ${winner?`· Winner: ${esc(winner)}`:''}</div>
+      </div>
+      <div class="sideTeam current-team-two"><span>${esc(team2)}</span><span class="flag">${flag(team2)}</span></div>
+    </div>
+    <div class="tiny mut" style="margin-top:8px">The table below shows each player's accumulated score through this selected match, plus what they predicted for the selected match and how many points that match is currently earning them.</div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="tablewrap leaderboard-tablewrap">
+      <table class="leaderboard-table">
+        <thead><tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>${esc(predictionHeader)}</th>
+          <th>Points This Match</th>
+          <th>Total Through #${originalMatchNo}</th>
+          <th>Champion Pick</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
 }
 function updateLeaderboardDynamic(){
   var lim=clampMatchNo(state.reveal&&state.reveal.match);
@@ -12019,7 +12312,16 @@ async function loadRemoteData(show){
   }
   if(rurl){
     attempted=true;
-    try{const txt=await fetchText(rurl); const trimmed=txt.trim(); let n=0; if(trimmed.startsWith('{')||trimmed.startsWith('['))n=applyResultsData(JSON.parse(trimmed)); else n=importResultsCSV(txt,false); messages.push('results: '+n+' scores loaded'); changed=true;}
+    try{
+      const before=JSON.stringify(state.actual||{});
+      const txt=await fetchText(rurl);
+      const trimmed=txt.trim();
+      let n=0;
+      if(trimmed.startsWith('{')||trimmed.startsWith('['))n=applyResultsData(JSON.parse(trimmed));
+      else n=importResultsCSV(txt,false);
+      messages.push('results: '+n+' scores loaded');
+      if(JSON.stringify(state.actual||{})!==before)changed=true;
+    }
     catch(e){
       if(rurl==='./results.csv'){
         try{const txt=await fetchText('./results.json'); const n=applyResultsData(JSON.parse(txt)); messages.push('results.json: '+n+' scores loaded'); changed=true;}catch(e2){if(show)messages.push('results not loaded: '+e.message);}
@@ -12027,10 +12329,12 @@ async function loadRemoteData(show){
     }
   }
   if(changed){
-  state.tab='leaderboard';
-  state.reveal={match:latestEnteredMatch()};
-  save();
-  render();
+    state.tab='leaderboard';
+    state.reveal={match:latestEnteredMatch()};
+    save();
+    const redraw=function(){try{render()}catch(e){showNonFatalError('Results refresh display skipped',e&&e.message?e.message:e)}};
+    if('requestAnimationFrame' in window)requestAnimationFrame(()=>requestAnimationFrame(redraw));
+    else setTimeout(redraw,50);
   }
   if(show){
     if(messages.length)alert(messages.join('\n'));
@@ -12273,21 +12577,48 @@ window.addEventListener('pageshow',function(event){
     state=loadInitialState();
     normalize();
     render();
-    setTimeout(()=>{try{if(state.remote&&state.remote.resultsUrl)loadRemoteData(false)}catch(e){}},100);
+    setTimeout(()=>{try{
+      if(state.remote&&state.remote.resultsUrl){
+        if('requestIdleCallback' in window)requestIdleCallback(()=>loadRemoteData(false),{timeout:3000});
+        else setTimeout(()=>loadRemoteData(false),500);
+      }
+    }catch(e){}},isAndroidDevice()?3500:500);
   }
 });
+function isAndroidDevice(){
+  return document.documentElement.classList.contains('android-device');
+}
+function scheduleInitialLiveRefresh(){
+  const run=function(){
+    try{
+      if(state.remote&&(state.remote.resultsUrl||(state.remote.autoLoad&&state.remote.playersUrl))){
+        loadRemoteData(false);
+      }
+    }catch(e){
+      showNonFatalError('Live refresh skipped',e&&e.message?e.message:e);
+    }
+  };
+
+  // Android receives more breathing room so first paint and touch handling
+  // finish before networking, parsing, scoring, and the second render begin.
+  const delay=isAndroidDevice()?6500:2200;
+
+  setTimeout(function(){
+    if('requestIdleCallback' in window){
+      requestIdleCallback(run,{timeout:3500});
+    }else{
+      setTimeout(run,250);
+    }
+  },delay);
+}
+
 try{
-console.info('FIFA Bracket build: 2026-06-11-no-browser-storage-1');
+console.info('FIFA Bracket build: 2026-06-11-android-performance');
   render();
   APP_RENDERED_OK=true;
   APP_STARTING=false;
-  // GitHub Pages + iPhone Safari can throw fake line-0 errors if Google Sheets is queried during first paint.
-  // Delay live refresh until the page is stable, and keep failures non-fatal.
-  setTimeout(()=>{try{
-    // Official results always refresh on a normal reload whenever a results source exists.
-    // Player/bracket data remains controlled by the optional autoLoad setting.
-    if(state.remote&&(state.remote.resultsUrl||(state.remote.autoLoad&&state.remote.playersUrl)))loadRemoteData(false);
-  }catch(e){showNonFatalError('Live refresh skipped', e&&e.message?e.message:e)}},1600);
+  // Let the interface become interactive before loading and recalculating live data.
+  scheduleInitialLiveRefresh();
 }catch(e){showStartupError('Startup error', esc(e.stack||e.message))}
 
 </script></body></html>
