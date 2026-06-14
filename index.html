@@ -2475,6 +2475,107 @@ button.tree-pick-team:hover{
   .leaderboard-table td:nth-child(6){width:32% !important}
 }
 
+
+/* Reliable sticky table headers on phones */
+@media(max-width:700px){
+  .leaderboard-tablewrap,
+  .compare-tablewrap{
+    display:block !important;
+    position:relative !important;
+    width:100% !important;
+    max-height:68vh !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    transform:none !important;
+    contain:none !important;
+  }
+
+  .leaderboard-table,
+  .compare-table{
+    position:relative;
+    border-collapse:separate !important;
+    border-spacing:0 !important;
+  }
+
+  .leaderboard-table thead,
+  .compare-table thead{
+    position:relative;
+    z-index:50;
+  }
+
+  .leaderboard-table thead th,
+  .compare-table thead th{
+    position:-webkit-sticky !important;
+    position:sticky !important;
+    top:0 !important;
+    z-index:60 !important;
+    background:var(--card2) !important;
+    background-clip:padding-box !important;
+    box-shadow:
+      inset 0 -1px 0 var(--line),
+      0 4px 9px rgba(0,0,0,.24) !important;
+  }
+
+  .leaderboard-table tbody td,
+  .compare-table tbody td{
+    position:relative;
+    z-index:1;
+  }
+
+  /* Prevent parent cards from clipping the sticky row */
+  .card:has(.leaderboard-tablewrap),
+  .card:has(.compare-tablewrap){
+    overflow:visible !important;
+  }
+}
+
+
+/* Phone leaderboard: show first five columns initially, Champion Pick on swipe */
+@media(max-width:700px){
+  .leaderboard-tablewrap{
+    overflow-x:auto !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .leaderboard-table{
+    width:128% !important;
+    min-width:128% !important;
+    table-layout:fixed !important;
+  }
+
+  /* First five columns together occupy the visible width */
+  .leaderboard-table th:nth-child(1),
+  .leaderboard-table td:nth-child(1){width:7% !important}
+
+  .leaderboard-table th:nth-child(2),
+  .leaderboard-table td:nth-child(2){width:18% !important}
+
+  .leaderboard-table th:nth-child(3),
+  .leaderboard-table td:nth-child(3){width:28% !important}
+
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(4){width:18% !important}
+
+  .leaderboard-table th:nth-child(5),
+  .leaderboard-table td:nth-child(5){width:15% !important}
+
+  /* Rightmost column remains just off-screen initially */
+  .leaderboard-table th:nth-child(6),
+  .leaderboard-table td:nth-child(6){width:14% !important}
+
+  .leaderboard-table th,
+  .leaderboard-table td{
+    padding:6px 3px !important;
+  }
+
+  .leaderboard-table .col-champion{
+    white-space:normal !important;
+  }
+}
+
 </style>
 
 <style>
