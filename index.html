@@ -2576,6 +2576,124 @@ button.tree-pick-team:hover{
   }
 }
 
+
+/* Robust mobile table header clone and improved column widths */
+.mobile-table-fixed-head{
+  display:none;
+}
+
+@media(max-width:700px){
+  .mobile-table-fixed-head{
+    position:fixed;
+    left:0;
+    top:0;
+    z-index:9998;
+    display:none;
+    overflow:hidden;
+    pointer-events:none;
+    background:var(--card2);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 5px 12px rgba(0,0,0,.22);
+  }
+
+  .mobile-table-fixed-head table{
+    border-collapse:separate;
+    border-spacing:0;
+    table-layout:fixed;
+    margin:0;
+  }
+
+  .mobile-table-fixed-head th{
+    position:static !important;
+    background:var(--card2) !important;
+    box-shadow:none !important;
+    text-align:center !important;
+    vertical-align:middle !important;
+    padding:7px 4px !important;
+    font-size:11px !important;
+    line-height:1.08;
+    white-space:normal !important;
+  }
+
+  /* Let normal page scrolling happen. The cloned header handles stickiness. */
+  .leaderboard-tablewrap,
+  .compare-tablewrap{
+    max-height:none !important;
+    overflow-y:visible !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .leaderboard-table{
+    width:142% !important;
+    min-width:142% !important;
+    table-layout:fixed !important;
+  }
+
+  /* First five columns remain readable; champion is reached by horizontal swipe */
+  .leaderboard-table th:nth-child(1),
+  .leaderboard-table td:nth-child(1){width:6% !important}
+
+  .leaderboard-table th:nth-child(2),
+  .leaderboard-table td:nth-child(2){width:20% !important}
+
+  .leaderboard-table th:nth-child(3),
+  .leaderboard-table td:nth-child(3){width:28% !important}
+
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(4){width:15% !important}
+
+  .leaderboard-table th:nth-child(5),
+  .leaderboard-table td:nth-child(5){width:13% !important}
+
+  .leaderboard-table th:nth-child(6),
+  .leaderboard-table td:nth-child(6){width:18% !important}
+
+  .leaderboard-table th,
+  .leaderboard-table td{
+    padding:7px 4px !important;
+    font-size:11.5px !important;
+    text-align:center !important;
+    vertical-align:middle !important;
+    white-space:normal !important;
+    overflow-wrap:break-word;
+  }
+
+  .leaderboard-table .col-name{
+    font-size:11.5px !important;
+    line-height:1.12;
+  }
+
+  .leaderboard-table .leader-prediction-cell{
+    font-size:12px !important;
+    white-space:normal !important;
+  }
+
+  /* Compare Brackets: keep player-name column and matchup column readable */
+  .compare-table{
+    min-width:980px !important;
+    table-layout:fixed !important;
+  }
+
+  .compare-table th:first-child,
+  .compare-table td:first-child{
+    width:58px !important;
+    text-align:center !important;
+  }
+
+  .compare-table th:nth-child(2),
+  .compare-table td:nth-child(2){
+    width:190px !important;
+    min-width:190px !important;
+    white-space:normal !important;
+  }
+
+  .compare-table th,
+  .compare-table td{
+    padding:8px 7px !important;
+  }
+}
+
 </style>
 
 <style>
@@ -11433,6 +11551,91 @@ function poolGroupEditorHTML(g){
 }
 function assignPersonPoolsFromElement(pid,el){const p=state.people.find(x=>x.id===pid); if(!p)return; const ids=selectedPoolIdsFromSelect(el); p.poolGroupIds=ids.length?ids:currentPoolDefaultIds();}
 
+
+let mobileFixedHeaderState=null;
+
+function removeMobileFixedTableHeader(){
+  if(mobileFixedHeaderState&&mobileFixedHeaderState.clone){
+    mobileFixedHeaderState.clone.remove();
+  }
+  if(mobileFixedHeaderState&&mobileFixedHeaderState.cleanup){
+    mobileFixedHeaderState.cleanup();
+  }
+  mobileFixedHeaderState=null;
+}
+
+function installMobileFixedTableHeader(){
+  removeMobileFixedTableHeader();
+  if(!window.matchMedia('(max-width:700px)').matches)return;
+
+  const table=document.querySelector('.leaderboard-table, .compare-table');
+  if(!table||!table.tHead||!table.tHead.rows.length)return;
+
+  const wrap=table.closest('.tablewrap');
+  if(!wrap)return;
+
+  const fixed=document.createElement('div');
+  fixed.className='mobile-table-fixed-head';
+
+  const cloneTable=document.createElement('table');
+  cloneTable.className=table.className;
+  cloneTable.appendChild(table.tHead.cloneNode(true));
+  fixed.appendChild(cloneTable);
+  document.body.appendChild(fixed);
+
+  function syncWidths(){
+    const sourceCells=[...table.tHead.rows[0].cells];
+    const cloneCells=[...cloneTable.tHead.rows[0].cells];
+    const tableRect=table.getBoundingClientRect();
+    cloneTable.style.width=table.offsetWidth+'px';
+
+    sourceCells.forEach((cell,index)=>{
+      if(cloneCells[index]){
+        const width=cell.getBoundingClientRect().width;
+        cloneCells[index].style.width=width+'px';
+        cloneCells[index].style.minWidth=width+'px';
+        cloneCells[index].style.maxWidth=width+'px';
+      }
+    });
+
+    const wrapRect=wrap.getBoundingClientRect();
+    fixed.style.left=Math.max(0,wrapRect.left)+'px';
+    fixed.style.width=Math.min(window.innerWidth-wrapRect.left,wrapRect.width)+'px';
+    cloneTable.style.transform=`translateX(${-wrap.scrollLeft}px)`;
+  }
+
+  function update(){
+    const wrapRect=wrap.getBoundingClientRect();
+    const headerHeight=table.tHead.getBoundingClientRect().height||42;
+    const visible=
+      wrapRect.top<=0 &&
+      wrapRect.bottom>headerHeight;
+
+    fixed.style.display=visible?'block':'none';
+    if(visible)syncWidths();
+  }
+
+  const onScroll=()=>requestAnimationFrame(update);
+  const onResize=()=>requestAnimationFrame(()=>{syncWidths();update()});
+  const onHorizontal=()=>requestAnimationFrame(syncWidths);
+
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onResize,{passive:true});
+  wrap.addEventListener('scroll',onHorizontal,{passive:true});
+
+  mobileFixedHeaderState={
+    clone:fixed,
+    cleanup:()=>{
+      window.removeEventListener('scroll',onScroll);
+      window.removeEventListener('resize',onResize);
+      wrap.removeEventListener('scroll',onHorizontal);
+    }
+  };
+
+  syncWidths();
+  update();
+}
+
 function render(){
   normalize();
   ensurePoolGroups();
@@ -11447,6 +11650,7 @@ function render(){
   root.innerHTML=`<div class="app">${settingsButton}<aside class="side"><div class="mobile-side-head"><button type="button" class="brand brand-button" data-tab="dashboard" title="${trText('Dashboard')}"><div class="logo">26</div><div><h1>${trText('FIFA Bracket')}</h1><p>${trText('2026 World Cup Pool')}</p></div></button>${mobileHeaderTools}</div><div class="nav">${navHTML(tab)}</div></aside><main class="main"><div class="top"><div><h2>${title(tab)}</h2><div class="sub">${subtitle(tab)}</div></div>${topActions}</div><div id="view">${view()}</div></main></div>`;
   bind();
   translateVisibleText(root);
+requestAnimationFrame(installMobileFixedTableHeader);
 }function title(t){return trText(({dashboard:'Dashboard',people:'Saved Brackets',bracket:'Match Results',tree:'Knockout Standings',summary:'Group Stage Standings',results:'FIFA 2026 Results',actualtree:'Knockout Standings',standings:'Group Stage Standings',leaderboard:'Leaderboard',compare:'Compare Brackets',settings:'Settings',io:'Import / Export',import:'Import / Export'})[t]||t)}
 function subtitle(t){return trText(({dashboard:'Overview and quick actions.',people:'Manage saved brackets: rename, duplicate, lock, unlock, or delete.',bracket:'Enter match predictions for the selected bracket.',tree:'Projected knockout-phase bracket for the selected entry.',summary:'Projected group-stage standings, third-place ranking, and top placements for the selected entry.',results:'View or refresh the real scores as the tournament happens.',actualtree:'Actual knockout-phase bracket based on the real results.',standings:'Actual group-stage standings computed from the real scores.',leaderboard:'Scrub through matches 1 to 104 and see the rankings at that exact point.',compare:'All players beside the real result.',settings:'Adjust score entry options and point values.',io:'CSV and JSON tools.'})[t]||'')}
 function view(){const tab=currentTab(); const views={dashboard,people,bracket,tree:treeView,summary:summaryView,results,actualtree:actualTreeView,standings,leaderboard,compare,settings,io:importView,import:importView}; const content=(views[tab]||dashboard)(); if(['bracket','summary','tree'].includes(tab))return bracketsSubnav(tab)+content; if(['people','compare','leaderboard'].includes(tab))return comparisonSubnav(tab)+content; return content;}
