@@ -2168,6 +2168,313 @@ button.tree-pick-team:hover{
   }
 }
 
+
+/* Sticky, compact Leaderboard and Compare Brackets headers */
+.leaderboard-tablewrap,
+.compare-tablewrap{
+  position:relative;
+}
+
+.leaderboard-table thead th,
+.compare-table thead th{
+  position:sticky !important;
+  top:0 !important;
+  z-index:30 !important;
+  background:var(--card2) !important;
+  box-shadow:0 1px 0 var(--line),0 5px 12px rgba(0,0,0,.18);
+}
+
+.leaderboard-table{
+  min-width:600px;
+  table-layout:auto;
+}
+
+.leaderboard-table th,
+.leaderboard-table td{
+  padding:8px 6px;
+}
+
+.leaderboard-table .col-rank{
+  width:30px;
+  min-width:30px;
+  max-width:30px;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.leaderboard-table .col-name{
+  width:88px;
+  min-width:76px;
+  max-width:105px;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  line-height:1.1;
+}
+
+.leaderboard-table .col-points{
+  width:54px;
+  min-width:54px;
+  max-width:58px;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.leaderboard-table .col-total{
+  width:46px;
+  min-width:46px;
+  max-width:50px;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.leaderboard-table .col-champion{
+  width:102px;
+  min-width:92px;
+  max-width:118px;
+  white-space:normal;
+}
+
+.leaderboard-table .leader-prediction-cell{
+  min-width:82px;
+}
+
+.compare-table{
+  border-collapse:separate;
+  border-spacing:0;
+}
+
+.compare-table thead th{
+  white-space:nowrap;
+}
+
+@media(max-width:700px){
+  .leaderboard-table{
+    min-width:530px;
+  }
+
+  .leaderboard-table th,
+  .leaderboard-table td{
+    padding:7px 4px !important;
+    font-size:12px;
+  }
+
+  .leaderboard-table .col-rank{
+    width:26px;
+    min-width:26px;
+    max-width:26px;
+  }
+
+  .leaderboard-table .col-name{
+    width:70px;
+    min-width:66px;
+    max-width:82px;
+    font-size:11.5px;
+  }
+
+  .leaderboard-table .col-points{
+    width:46px;
+    min-width:46px;
+    max-width:50px;
+  }
+
+  .leaderboard-table .col-total{
+    width:40px;
+    min-width:40px;
+    max-width:44px;
+  }
+
+  .leaderboard-table .col-champion{
+    width:84px;
+    min-width:80px;
+    max-width:94px;
+  }
+}
+
+
+/* Even-width leaderboard columns that fit the available width */
+.leaderboard-table{
+  width:100%;
+  min-width:0 !important;
+  table-layout:fixed !important;
+}
+
+.leaderboard-table th,
+.leaderboard-table td{
+  box-sizing:border-box;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.leaderboard-table .col-rank,
+.leaderboard-table .col-name,
+.leaderboard-table .leader-prediction-cell,
+.leaderboard-table .col-points,
+.leaderboard-table .col-total,
+.leaderboard-table .col-champion{
+  width:auto !important;
+  min-width:0 !important;
+  max-width:none !important;
+}
+
+/* Six balanced columns */
+.leaderboard-table th:nth-child(1),
+.leaderboard-table td:nth-child(1){width:7%}
+
+.leaderboard-table th:nth-child(2),
+.leaderboard-table td:nth-child(2){width:16%}
+
+.leaderboard-table th:nth-child(3),
+.leaderboard-table td:nth-child(3){width:24%}
+
+.leaderboard-table th:nth-child(4),
+.leaderboard-table td:nth-child(4){width:15%}
+
+.leaderboard-table th:nth-child(5),
+.leaderboard-table td:nth-child(5){width:13%}
+
+.leaderboard-table th:nth-child(6),
+.leaderboard-table td:nth-child(6){width:25%}
+
+.leaderboard-table th{
+  white-space:normal !important;
+  line-height:1.08;
+}
+
+.leaderboard-table td{
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+
+.leaderboard-table .col-rank,
+.leaderboard-table .col-points,
+.leaderboard-table .col-total,
+.leaderboard-table .leader-group-score{
+  text-align:center;
+}
+
+.leaderboard-tablewrap{
+  overflow-x:hidden !important;
+}
+
+@media(max-width:700px){
+  .leaderboard-table{
+    width:100%;
+    min-width:0 !important;
+    table-layout:fixed !important;
+  }
+
+  .leaderboard-table th,
+  .leaderboard-table td{
+    padding:6px 3px !important;
+    font-size:11px !important;
+  }
+
+  .leaderboard-table .player-color-name{
+    font-size:11px !important;
+  }
+
+  .leaderboard-table th:nth-child(1),
+  .leaderboard-table td:nth-child(1){width:7%}
+
+  .leaderboard-table th:nth-child(2),
+  .leaderboard-table td:nth-child(2){width:18%}
+
+  .leaderboard-table th:nth-child(3),
+  .leaderboard-table td:nth-child(3){width:22%}
+
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(4){width:15%}
+
+  .leaderboard-table th:nth-child(5),
+  .leaderboard-table td:nth-child(5){width:13%}
+
+  .leaderboard-table th:nth-child(6),
+  .leaderboard-table td:nth-child(6){width:25%}
+}
+
+
+/* Compact centered leaderboard columns */
+.leaderboard-table{
+  width:100%;
+  min-width:0 !important;
+  table-layout:fixed !important;
+}
+
+.leaderboard-table th,
+.leaderboard-table td{
+  text-align:center !important;
+  vertical-align:middle !important;
+  padding:7px 4px !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere;
+  line-height:1.08;
+}
+
+/* Keep every column compact and balanced */
+.leaderboard-table th:nth-child(1),
+.leaderboard-table td:nth-child(1){width:6% !important}
+
+.leaderboard-table th:nth-child(2),
+.leaderboard-table td:nth-child(2){width:16% !important}
+
+.leaderboard-table th:nth-child(3),
+.leaderboard-table td:nth-child(3){width:20% !important}
+
+.leaderboard-table th:nth-child(4),
+.leaderboard-table td:nth-child(4){width:14% !important}
+
+.leaderboard-table th:nth-child(5),
+.leaderboard-table td:nth-child(5){width:12% !important}
+
+.leaderboard-table th:nth-child(6),
+.leaderboard-table td:nth-child(6){width:32% !important}
+
+.leaderboard-table .player-color-name,
+.leaderboard-table .leader-prediction-cell,
+.leaderboard-table .col-champion{
+  text-align:center !important;
+}
+
+.leaderboard-table .col-rank,
+.leaderboard-table .col-name,
+.leaderboard-table .leader-prediction-cell,
+.leaderboard-table .col-points,
+.leaderboard-table .col-total,
+.leaderboard-table .col-champion{
+  min-width:0 !important;
+  max-width:none !important;
+}
+
+@media(max-width:700px){
+  .leaderboard-table th,
+  .leaderboard-table td{
+    padding:6px 2px !important;
+    font-size:10.5px !important;
+  }
+
+  .leaderboard-table .player-color-name{
+    font-size:10.5px !important;
+  }
+
+  .leaderboard-table th:nth-child(1),
+  .leaderboard-table td:nth-child(1){width:6% !important}
+
+  .leaderboard-table th:nth-child(2),
+  .leaderboard-table td:nth-child(2){width:17% !important}
+
+  .leaderboard-table th:nth-child(3),
+  .leaderboard-table td:nth-child(3){width:19% !important}
+
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(4){width:14% !important}
+
+  .leaderboard-table th:nth-child(5),
+  .leaderboard-table td:nth-child(5){width:12% !important}
+
+  .leaderboard-table th:nth-child(6),
+  .leaderboard-table td:nth-child(6){width:32% !important}
+}
+
 </style>
 
 <style>
@@ -11089,7 +11396,7 @@ function dashboard(){
     <div class="card"><h3>Leader</h3><div class="stat">${esc(leader?leader.name:'None')}</div><div class="tiny mut">${leader?`${leader.total} pts${second?` · +${leadMargin} over ${esc(second.name)}`:''}`:'No scores yet'}</div></div>
   </div>
   <div class="grid cols3" style="margin-top:16px">
-    <div class="card"><h3>Race at the Top</h3><div class="tablewrap" style="max-height:260px;overflow-y:auto;overflow-x:hidden"><table style="min-width:0;width:100%;table-layout:fixed"><thead><tr><th style="width:44px">#</th><th>Name</th><th style="width:112px;text-align:right">Points</th></tr></thead><tbody>${top3.length?top3.map((x,i)=>`<tr class="${i===0?'rank-gold':i===1?'rank-silver':'rank-bronze'}"><td>${i+1}</td><td style="white-space:normal;word-break:break-word;overflow-wrap:anywhere"><b>${esc(x.name)}</b></td><td style="text-align:right"><span class="pill" style="white-space:nowrap"><b>${x.total}</b> pts</span></td></tr>`).join(''):`<tr><td colspan="3" class="mut">No players yet.</td></tr>`}</tbody></table></div></div>
+    <div class="card"><h3>Race at the Top</h3><div class="tablewrap" style="max-height:260px;overflow-y:auto;overflow-x:hidden"><table style="min-width:0;width:100%;table-layout:fixed"><thead><tr><th style="width:44px">#</th><th class="col-name">Name</th><th style="width:112px;text-align:right">Points</th></tr></thead><tbody>${top3.length?top3.map((x,i)=>`<tr class="${i===0?'rank-gold':i===1?'rank-silver':'rank-bronze'}"><td>${i+1}</td><td style="white-space:normal;word-break:break-word;overflow-wrap:anywhere"><b>${esc(x.name)}</b></td><td style="text-align:right"><span class="pill" style="white-space:nowrap"><b>${x.total}</b> pts</span></td></tr>`).join(''):`<tr><td colspan="3" class="mut">No players yet.</td></tr>`}</tbody></table></div></div>
     <div class="card"><h3>Exact Score King</h3><div class="stat">${exactLeaders[0]?exactLeaders[0].exact:0}</div><div class="tiny mut">${exactLeaders[0]?`${esc(exactLeaders[0].name)} exact score${exactLeaders[0].exact===1?'':'s'}`:'No exact scores yet'}</div><div class="tiny mut" style="margin-top:8px">Pool average: ${avgPts} pts</div></div>
     <div class="card"><h3>Biggest Single-Match Haul</h3><div class="stat">${biggest.pts}</div><div class="tiny mut">${esc(biggest.name)}${biggest.match?` · Match #${biggest.match}`:''}</div><div class="tiny mut">${esc(biggest.pred||'No scoring match yet')}</div></div>
   </div>
@@ -11595,12 +11902,12 @@ function leaderDynamic(rawLim){
     const style=playerCellStyle(person);
 
     return `<tr class="player-color-row" style="${playerColorVars(person)}">
-      <td style="${style}">${index+1}</td>
-      <td class="player-color-name" style="${style}">${esc(personPoints.name)}</td>
+      <td class="col-rank" style="${style}">${index+1}</td>
+      <td class="player-color-name col-name" style="${style}">${esc(personPoints.name)}</td>
       <td class="leader-prediction-cell ${isGroup?'leader-group-score':''}" style="${style}">${esc(leaderboardPredictionForMatch(current,person))}</td>
-      <td style="${style}"><b>${matchPoints}</b></td>
-      <td style="${style}"><b>${personPoints.total}</b></td>
-      <td style="${style}">${esc((teamById[championPickID(person)]&&teamById[championPickID(person)].name)||'None')}</td>
+      <td class="col-points" style="${style}"><b>${matchPoints}</b></td>
+      <td class="col-total" style="${style}"><b>${personPoints.total}</b></td>
+      <td class="col-champion" style="${style}">${esc((teamById[championPickID(person)]&&teamById[championPickID(person)].name)||'None')}</td>
     </tr>`;
   }).join('');
 
@@ -11621,12 +11928,12 @@ function leaderDynamic(rawLim){
       <table class="leaderboard-table">
         <thead>
           <tr>
-            <th>Rank</th>
+            <th class="col-rank">#</th>
             <th>Name</th>
             <th>${esc(predictionHeader)}</th>
-            <th>Points This Match</th>
-            <th>Total Through #${originalMatchNo}</th>
-            <th>Champion Pick</th>
+            <th class="col-points">+ points</th>
+            <th class="col-total">Total</th>
+            <th class="col-champion">Champion Pick</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -11669,7 +11976,7 @@ function compare(){
     });
   }
   const headers=people.map(p=>`<th class="player-color-cell player-color-name" style="${playerCellStyle(p)}" title="${esc(playerColorMeta(p).name)}">${esc(p.name)}</th>`).join('');
-  return `<div class="tablewrap"><table class="comparison-color-table"><thead><tr><th>#</th><th>Match</th><th>Real</th><th>Winner</th>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="tablewrap compare-tablewrap"><table class="comparison-color-table compare-table"><thead><tr><th>#</th><th>Match</th><th>Real</th><th>Winner</th>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function settingLabel(k){return k.replace(/([A-Z])/g,' $1').replace(/^./,c=>c.toUpperCase())}
 function settingInput(k){ if(k==='knockoutScoringMode')return `<select style="width:100%;margin-top:8px" data-setting="${k}"><option value="strictMatchPath" ${state.scoring[k]==='strictMatchPath'?'selected':''}>Strict match path only</option><option value="roundReached" ${state.scoring[k]==='roundReached'?'selected':''}>Round reached</option><option value="hybrid" ${state.scoring[k]==='hybrid'?'selected':''}>Hybrid</option></select>`; if(boolSetting(k))return `<select style="width:100%;margin-top:8px" data-setting="${k}"><option value="1" ${truthy(state.scoring[k])?'selected':''}>On</option><option value="0" ${!truthy(state.scoring[k])?'selected':''}>Off</option></select>`; return `<input style="width:100%;margin-top:8px" type="number" data-setting="${k}" value="${state.scoring[k]}">`;}
