@@ -2240,6 +2240,91 @@ button.tree-pick-team:hover{
   }
 }
 
+
+/* Simple adjusted-score display */
+.late-entry-tag{
+  color:var(--gold) !important;
+  font-weight:950 !important;
+}
+.late-entry-box{
+  cursor:pointer;
+  margin-top:4px !important;
+  padding:4px 5px !important;
+  font-size:10.5px !important;
+  line-height:1.12 !important;
+  text-align:center;
+}
+.late-entry-box summary{
+  list-style:none;
+  cursor:pointer;
+  font-weight:850;
+}
+.late-entry-box summary::-webkit-details-marker{
+  display:none;
+}
+.late-entry-box summary::after{
+  content:" tap";
+  color:var(--mut);
+  font-size:9px;
+  font-weight:750;
+}
+.late-entry-box[open] summary::after{
+  content:"";
+}
+.late-entry-more{
+  margin-top:5px;
+  padding-top:5px;
+  border-top:1px solid rgba(217,189,119,.28);
+  color:var(--mut);
+}
+@media(max-width:700px){
+  .late-entry-box{
+    font-size:9.5px !important;
+    padding:4px 3px !important;
+  }
+}
+
+
+/* Leaderboard average column and discreet adjusted marker */
+.late-entry-tag{
+  color:var(--mut) !important;
+  font-weight:750 !important;
+  opacity:.78;
+  background:transparent !important;
+  border:0 !important;
+  padding:0 !important;
+}
+.late-entry-box{
+  color:var(--mut) !important;
+}
+.late-entry-box summary{
+  color:var(--mut) !important;
+}
+.leaderboard-table th,
+.leaderboard-table td{
+  text-align:center !important;
+}
+@media(max-width:700px){
+  .leaderboard-table{
+    width:158% !important;
+    min-width:158% !important;
+  }
+  .leaderboard-table th:nth-child(1),
+  .leaderboard-table td:nth-child(1){width:5% !important}
+  .leaderboard-table th:nth-child(2),
+  .leaderboard-table td:nth-child(2){width:17% !important}
+  .leaderboard-table th:nth-child(3),
+  .leaderboard-table td:nth-child(3){width:21% !important}
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(4){width:12% !important}
+  .leaderboard-table th:nth-child(5),
+  .leaderboard-table td:nth-child(5){width:14% !important}
+  .leaderboard-table th:nth-child(6),
+  .leaderboard-table td:nth-child(6){width:14% !important}
+  .leaderboard-table th:nth-child(7),
+  .leaderboard-table td:nth-child(7){width:17% !important}
+}
+
 </style>
 
 <style>
@@ -11810,20 +11895,29 @@ function leaderDynamic(rawLim){
     const lateMissed=Number(d._lateEntryMissedGames||0);
     const lateValidStart=Number(d._lateEntryValidStart||25);
     const lateAdjustment=Number(personPoints.lateAdjustment||d._lateEntryAdjustment||0);
+    const appliedMissed=Number(d._lateEntryAppliedMissedGames||0);
+    const accumulated=Number(personPoints.total||0)-Number(lateAdjustment||0);
+    const completedThroughSelected=TOURNAMENT.matches.filter(m=>leaderboardPositionForMatch(m)<=position&&((state.actual[m.matchNumber]||{}).s1!==null)&&((state.actual[m.matchNumber]||{}).s1!=='')&&((state.actual[m.matchNumber]||{}).s2!==null)&&((state.actual[m.matchNumber]||{}).s2!=='')).length;
+    const averageGames=isLate?Math.max(1,completedThroughSelected):Math.max(1,completedThroughSelected);
+    const averagePerGame=completedThroughSelected>0?Number(personPoints.total||0)/averageGames:0;
     const lateDetails=isLate&&lateKnownCount>0
-      ? `<div class="late-entry-box">
-          <div><b>Avg:</b> ${lateAverage.toFixed(2)}/game</div>
-          <div><b>Adj:</b> +${fmtPts(lateAdjustment)} for ${Number(d._lateEntryAppliedMissedGames||0)}/${lateMissed}</div>
-          <div class="tiny">${lateKnownPoints} pts / ${lateKnownCount} games</div>
-        </div>`
-      : (isLate?`<div class="late-entry-box">Avg pending</div>`:'');
+      ? `<details class="late-entry-box">
+          <summary>${appliedMissed} × ${lateAverage.toFixed(2)} avg<br><span class="tiny">+ ${fmtPts(accumulated)} actual</span></summary>
+          <div class="late-entry-more">
+            <div>After entry: games #${lateValidStart}+</div>
+            <div>Average source: ${lateKnownPoints} pts / ${lateKnownCount} games</div>
+            <div>Adjusted games: ${appliedMissed}/${lateMissed}</div>
+          </div>
+        </details>`
+      : (isLate?`<details class="late-entry-box"><summary>Adjustment pending</summary><div class="late-entry-more">After entry: games #${lateValidStart}+</div></details>`:'');
 
     return `<tr class="player-color-row ${isLate?'late-entry-row':''}" style="${playerColorVars(person)}">
       <td style="${style}">${index+1}</td>
-      <td class="player-color-name" style="${style}">${esc(personPoints.name)}${isLate?`<div class="tiny late-entry-tag">Late entry</div>`:''}</td>
+      <td class="player-color-name" style="${style}">${esc(personPoints.name)}${isLate?`<div class="tiny late-entry-tag">(Adjusted)</div>`:''}</td>
       <td class="leader-prediction-cell ${isGroup?'leader-group-score':''}" style="${style}">${esc(leaderboardPredictionForMatch(current,person))}</td>
       <td style="${style}"><b>${fmtPts(matchPoints)}</b></td>
       <td style="${style}"><b>${fmtPts(personPoints.total)}</b>${lateDetails}</td>
+      <td style="${style}"><b>${completedThroughSelected>0?averagePerGame.toFixed(2):'0.00'}</b></td>
       <td style="${style}">${esc((teamById[championPickID(person)]&&teamById[championPickID(person)].name)||'None')}</td>
     </tr>`;
   }).join('');
@@ -11833,7 +11927,7 @@ function leaderDynamic(rawLim){
     return person&&person.lateEntry&&person.lateEntry.enabled;
   });
   const lateSummary=latePeople.length?`<div class="notice late-entry-summary">
-    <b>Fr. James:</b> games 1-24 use his known-score average from #25 onward.
+    <b>(Adjusted):</b> games 1-24 use his after-entry average.
   </div>`:'';
 
   return `<div class="card">
@@ -11858,7 +11952,8 @@ function leaderDynamic(rawLim){
             <th>Name</th>
             <th>${esc(predictionHeader)}</th>
             <th>+ points</th>
-            <th>Total / Late Avg.</th>
+            <th>Total</th>
+            <th>Average / Game</th>
             <th>Champion Pick</th>
           </tr>
         </thead>
