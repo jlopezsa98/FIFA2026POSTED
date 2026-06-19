@@ -2325,6 +2325,45 @@ button.tree-pick-team:hover{
   .leaderboard-table td:nth-child(7){width:17% !important}
 }
 
+
+/* After game 24, keep adjusted details available but discreet */
+.late-entry-collapsed-normal{
+  background:transparent !important;
+  border:0 !important;
+  padding:0 !important;
+  margin-top:2px !important;
+  opacity:.62;
+}
+.late-entry-collapsed-normal summary{
+  font-size:9px !important;
+  color:var(--mut) !important;
+  font-weight:650 !important;
+}
+.late-entry-collapsed-normal summary::after{
+  content:"" !important;
+}
+.late-entry-collapsed-normal[open]{
+  padding:5px !important;
+  border:1px solid rgba(217,189,119,.22) !important;
+  background:rgba(217,189,119,.08) !important;
+  opacity:1;
+}
+
+
+/* Clearer adjusted detail text */
+.late-entry-more{
+  text-align:left;
+  line-height:1.22 !important;
+}
+.late-entry-more div{
+  margin:2px 0;
+}
+@media(max-width:700px){
+  .late-entry-more{
+    font-size:9.5px !important;
+  }
+}
+
 </style>
 
 <style>
@@ -11877,6 +11916,7 @@ function leaderDynamic(rawLim){
   const winner=current?winnerName(current,'actual'):'';
   const score=isScoreEntered(actual)?`${actual.s1} - ${actual.s2}`:'No result entered yet';
   const isGroup=!!(current&&current.stage==='group');
+  const isAdjustedDisplayRange=!!(current&&current.stage==='group'&&originalMatchNo<=24);
 
   const predictionHeader=isGroup
     ? `${teamAbbreviation(team1)} vs ${teamAbbreviation(team2)}`
@@ -11901,19 +11941,22 @@ function leaderDynamic(rawLim){
     const averageGames=isLate?Math.max(1,completedThroughSelected):Math.max(1,completedThroughSelected);
     const averagePerGame=completedThroughSelected>0?Number(personPoints.total||0)/averageGames:0;
     const lateDetails=isLate&&lateKnownCount>0
-      ? `<details class="late-entry-box">
-          <summary>${appliedMissed} × ${lateAverage.toFixed(2)} avg<br><span class="tiny">+ ${fmtPts(accumulated)} actual</span></summary>
+      ? `<details class="late-entry-box ${isAdjustedDisplayRange?'':'late-entry-collapsed-normal'}">
+          <summary>${isAdjustedDisplayRange
+            ? `${appliedMissed} × ${lateAverage.toFixed(2)} avg<br><span class="tiny">+ ${fmtPts(accumulated)} actual</span>`
+            : `details`}</summary>
           <div class="late-entry-more">
-            <div>After entry: games #${lateValidStart}+</div>
-            <div>Average source: ${lateKnownPoints} pts / ${lateKnownCount} games</div>
-            <div>Adjusted games: ${appliedMissed}/${lateMissed}</div>
+            <div>Games 1-${lateMissed}: ${lateAverage.toFixed(2)} pts each</div>
+            <div>Early-game replacement so far: +${fmtPts(lateAdjustment)}</div>
+            <div>Actual points after entry: +${fmtPts(accumulated)}</div>
+            <div class="tiny">Average is based on games #${lateValidStart} to the end of the group stage.</div>
           </div>
         </details>`
-      : (isLate?`<details class="late-entry-box"><summary>Adjustment pending</summary><div class="late-entry-more">After entry: games #${lateValidStart}+</div></details>`:'');
+      : (isLate?`<details class="late-entry-box ${isAdjustedDisplayRange?'':'late-entry-collapsed-normal'}"><summary>${isAdjustedDisplayRange?'Adjustment pending':'details'}</summary><div class="late-entry-more">Waiting for games #${lateValidStart}+ to calculate the average.</div></details>`:'');
 
     return `<tr class="player-color-row ${isLate?'late-entry-row':''}" style="${playerColorVars(person)}">
       <td style="${style}">${index+1}</td>
-      <td class="player-color-name" style="${style}">${esc(personPoints.name)}${isLate?`<div class="tiny late-entry-tag">(Adjusted)</div>`:''}</td>
+      <td class="player-color-name" style="${style}">${esc(personPoints.name)}${isLate&&isAdjustedDisplayRange?`<div class="tiny late-entry-tag">(Adjusted)</div>`:''}</td>
       <td class="leader-prediction-cell ${isGroup?'leader-group-score':''}" style="${style}">${esc(leaderboardPredictionForMatch(current,person))}</td>
       <td style="${style}"><b>${fmtPts(matchPoints)}</b></td>
       <td style="${style}"><b>${fmtPts(personPoints.total)}</b>${lateDetails}</td>
@@ -11926,7 +11969,7 @@ function leaderDynamic(rawLim){
     const person=state.people.find(item=>item.id===pp.id);
     return person&&person.lateEntry&&person.lateEntry.enabled;
   });
-  const lateSummary=latePeople.length?`<div class="notice late-entry-summary">
+  const lateSummary=latePeople.length&&isAdjustedDisplayRange?`<div class="notice late-entry-summary">
     <b>(Adjusted):</b> games 1-24 use his after-entry average.
   </div>`:'';
 
