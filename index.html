@@ -2445,6 +2445,89 @@ button.tree-pick-team:hover{
 }
 
 @media(max-width:900px){.dashboard-days-grid{grid-template-columns:1fr}.dashboard-schedule-game-main{grid-template-columns:1fr}.dashboard-schedule-card-result{text-align:left;margin-top:6px}}
+
+/* Mobile fix for Upcoming Matches: stack rows so team names and flags do not get squeezed */
+@media(max-width:760px){
+  .dashboard-upcoming-wrap{
+    max-height:420px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    border-radius:18px;
+  }
+  .dashboard-upcoming-table{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    table-layout:auto!important;
+  }
+  .dashboard-upcoming-table thead{display:none!important}
+  .dashboard-upcoming-table tbody{display:block!important;width:100%!important}
+  .dashboard-upcoming-table tr{
+    display:block!important;
+    width:100%!important;
+    padding:10px 10px 11px;
+    border-bottom:1px solid #e6eef7;
+    background:rgba(255,255,255,.62);
+  }
+  .dashboard-upcoming-table tr:last-child{border-bottom:0}
+  .dashboard-upcoming-table td{
+    display:grid!important;
+    grid-template-columns:74px minmax(0,1fr);
+    gap:8px;
+    align-items:start;
+    width:100%!important;
+    padding:4px 2px!important;
+    border-bottom:0!important;
+    text-align:left!important;
+    white-space:normal!important;
+  }
+  .dashboard-upcoming-table td:before{
+    color:var(--mut);
+    font-size:11px;
+    font-weight:950;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    line-height:1.35;
+    padding-top:2px;
+  }
+  .dashboard-upcoming-table td:nth-child(1):before{content:'Date'}
+  .dashboard-upcoming-table td:nth-child(2):before{content:'Time'}
+  .dashboard-upcoming-table td:nth-child(3):before{content:'Match'}
+  .dashboard-upcoming-table td:nth-child(4):before{content:'Teams'}
+  .dashboard-upcoming-table td:nth-child(5):before{content:'Result'}
+  .dashboard-upcoming-table td:nth-child(6):before{content:'Venue'}
+  .dashboard-upcoming-teams{
+    display:grid!important;
+    grid-template-columns:1fr;
+    gap:4px;
+    align-items:start;
+    min-width:0;
+    width:100%;
+    flex-wrap:nowrap!important;
+  }
+  .dashboard-upcoming-team{
+    display:flex!important;
+    align-items:center;
+    gap:7px;
+    min-width:0;
+    width:100%;
+  }
+  .dashboard-upcoming-team-name{
+    max-width:none!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    white-space:normal!important;
+    line-height:1.22;
+  }
+  .dashboard-upcoming-vs{
+    display:block;
+    padding-left:28px;
+    line-height:1.1;
+  }
+  .dashboard-upcoming-result b{font-size:16px}
+  .dashboard-upcoming-date,.dashboard-upcoming-match{white-space:normal!important}
+}
+
 </style>
 
 <style>
