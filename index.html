@@ -12240,22 +12240,58 @@ function render(){
 }function title(t){return trText(({dashboard:'Dashboard',people:'Saved Brackets',bracket:'Match Results',tree:'Knockout Standings',summary:'Group Stage Standings',results:'FIFA 2026 Results',actualtree:'Knockout Standings',standings:'Group Stage Standings',leaderboard:'Leaderboard',compare:'Compare Brackets',settings:'Settings',io:'Import / Export',import:'Import / Export'})[t]||t)}
 function subtitle(t){return trText(({dashboard:'Overview and quick actions.',people:'Manage saved brackets: rename, duplicate, lock, unlock, or delete.',bracket:'Enter match predictions for the selected bracket.',tree:'Projected knockout-phase bracket for the selected entry.',summary:'Projected group-stage standings, third-place ranking, and top placements for the selected entry.',results:'View or refresh the real scores as the tournament happens.',actualtree:'Actual knockout-phase bracket based on the real results.',standings:'Actual group-stage standings computed from the real scores.',leaderboard:'Scrub through matches 1 to 104 and see the rankings at that exact point.',compare:'All players beside the real result.',settings:'Adjust score entry options and point values.',io:'CSV and JSON tools.'})[t]||'')}
 function view(){const tab=currentTab(); const views={dashboard,people,bracket,tree:treeView,summary:summaryView,results,actualtree:actualTreeView,standings,leaderboard,compare,settings,io:importView,import:importView}; const content=(views[tab]||dashboard)(); if(['bracket','summary','tree'].includes(tab))return bracketsSubnav(tab)+content; if(['people','compare','leaderboard'].includes(tab))return comparisonSubnav(tab)+content; return content;}
+function dashboardScheduleTimeZone(){
+  return currentLang()==='es'?'America/Mexico_City':'America/Vancouver';
+}
+function dashboardScheduleLocale(){
+  return currentLang()==='es'?'es-MX':'en-CA';
+}
+function dashboardScheduleTimeZoneLabel(){
+  return currentLang()==='es'?'Hora de Ciudad de México':'Vancouver time';
+}
+function dashboardParseEasternDate(dateText){
+  const raw=String(dateText||'').trim();
+  if(!raw)return null;
+  const months={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,sept:8,oct:9,nov:10,dec:11};
+  const m=raw.match(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+(\d{1,2}),\s*(\d{4})\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if(!m){
+    const d=new Date(raw);
+    return Number.isFinite(d.getTime())?d:null;
+  }
+  let hour=+m[4];
+  const minute=+m[5];
+  const ap=m[6].toUpperCase();
+  if(ap==='PM'&&hour!==12)hour+=12;
+  if(ap==='AM'&&hour===12)hour=0;
+  // Stored FIFA kickoff strings are Eastern Time. During Jun/Jul 2026, ET is EDT (UTC-4).
+  return new Date(Date.UTC(+m[3],months[m[1].toLowerCase()],+m[2],hour+4,minute));
+}
 function dashboardMatchDate(match){
-  const d=new Date(match&&match.dateText?match.dateText:'');
-  return Number.isFinite(d.getTime())?d:null;
+  const d=dashboardParseEasternDate(match&&match.dateText?match.dateText:'');
+  return d&&Number.isFinite(d.getTime())?d:null;
 }
 function dashboardDateKey(d){
   if(!d)return '';
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:dashboardScheduleTimeZone(),year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  const get=t=>(parts.find(p=>p.type===t)||{}).value||'';
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+function dashboardTodayKey(){
+  return dashboardDateKey(new Date());
 }
 function dashboardTimeText(match){
   const d=dashboardMatchDate(match);
   if(!d)return esc(match&&match.dateText?match.dateText:'TBD');
-  return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  return new Intl.DateTimeFormat(dashboardScheduleLocale(),{timeZone:dashboardScheduleTimeZone(),hour:'numeric',minute:'2-digit',hour12:true}).format(d).replace(/\s/g,' ');
 }
 function dashboardDateLabelFromKey(key){
-  const d=new Date(key+'T12:00:00');
-  return Number.isFinite(d.getTime())?d.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'}):key;
+  const parts=String(key||'').split('-').map(Number);
+  if(parts.length<3||parts.some(n=>!Number.isFinite(n)))return key;
+  const d=new Date(Date.UTC(parts[0],parts[1]-1,parts[2],12,0));
+  return new Intl.DateTimeFormat(dashboardScheduleLocale(),{timeZone:'UTC',weekday:'short',month:'short',day:'numeric'}).format(d).replace(/\./g,'');
+}
+function dashboardDateText(d){
+  return d?new Intl.DateTimeFormat(dashboardScheduleLocale(),{timeZone:dashboardScheduleTimeZone(),weekday:'short',month:'short',day:'numeric'}).format(d).replace(/\./g,''):'TBD';
 }
 function dashboardMatchTeams(match){
   return `${teamName(match.team1Ref,'actual')} vs ${teamName(match.team2Ref,'actual')}`;
@@ -12319,7 +12355,7 @@ function dashboardUpcomingResultHTML(match){
 }
 function dashboardUpcomingRow(x){
   const m=x.m;
-  const date=x.d?x.d.toLocaleDateString([], {weekday:'short', month:'short', day:'numeric'}):'TBD';
+  const date=dashboardDateText(x.d);
   return `<tr>
     <td class="dashboard-upcoming-date">${esc(date)}</td>
     <td class="dashboard-schedule-time"><b>${dashboardTimeText(m)}</b></td>
@@ -12330,16 +12366,15 @@ function dashboardUpcomingRow(x){
   </tr>`;
 }
 function dashboardScheduleSection(){
-  const today=new Date();
-  const dayStart=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+  const todayKey=dashboardTodayKey();
   const allFromToday=TOURNAMENT.matches
     .map(m=>({m,d:dashboardMatchDate(m)}))
-    .filter(x=>x.d&&x.d>=dayStart)
+    .filter(x=>x.d&&dashboardDateKey(x.d)>=todayKey)
     .sort((a,b)=>a.d-b.d||a.m.matchNumber-b.m.matchNumber);
   const rows=allFromToday.length
     ? allFromToday.map(dashboardUpcomingRow).join('')
     : `<tr><td colspan="6"><div class="notice mut">${esc(trText('No upcoming matches listed.'))}</div></td></tr>`;
-  return `<div class="card dashboard-schedule-card"><h3>${trText('Upcoming Matches')}</h3><p class="mut tiny" style="margin-top:-4px">${trText('Matches from today onward')}</p><div class="dashboard-upcoming-wrap"><table class="dashboard-upcoming-table"><thead><tr><th>${trText('Date')}</th><th>${trText('Time')}</th><th>${trText('Match')}</th><th>${trText('Teams')}</th><th>${trText('Result')}</th><th>${trText('Venue')}</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  return `<div class="card dashboard-schedule-card"><h3>${trText('Upcoming Matches')}</h3><p class="mut tiny" style="margin-top:-4px">${trText('Matches from today onward')} · ${esc(dashboardScheduleTimeZoneLabel())}</p><div class="dashboard-upcoming-wrap"><table class="dashboard-upcoming-table"><thead><tr><th>${trText('Date')}</th><th>${trText('Time')}</th><th>${trText('Match')}</th><th>${trText('Teams')}</th><th>${trText('Result')}</th><th>${trText('Venue')}</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 function dashboardExactScoreLeaders(people){
   return people.map(p=>{
