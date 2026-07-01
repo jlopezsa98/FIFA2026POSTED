@@ -2528,6 +2528,14 @@ button.tree-pick-team:hover{
   .dashboard-upcoming-date,.dashboard-upcoming-match{white-space:normal!important}
 }
 
+
+/* Leaderboard selected-match kickoff display */
+.current-match-datetime{
+  color:var(--mut);
+  font-weight:850;
+  margin-bottom:2px;
+}
+
 </style>
 
 <style>
@@ -12247,7 +12255,7 @@ function dashboardScheduleLocale(){
   return currentLang()==='es'?'es-MX':'en-CA';
 }
 function dashboardScheduleTimeZoneLabel(){
-  return currentLang()==='es'?'Hora de Ciudad de México':'Vancouver time';
+  return '';
 }
 function dashboardParseEasternDate(dateText){
   const raw=String(dateText||'').trim();
@@ -12374,7 +12382,7 @@ function dashboardScheduleSection(){
   const rows=allFromToday.length
     ? allFromToday.map(dashboardUpcomingRow).join('')
     : `<tr><td colspan="6"><div class="notice mut">${esc(trText('No upcoming matches listed.'))}</div></td></tr>`;
-  return `<div class="card dashboard-schedule-card"><h3>${trText('Upcoming Matches')}</h3><p class="mut tiny" style="margin-top:-4px">${trText('Matches from today onward')} · ${esc(dashboardScheduleTimeZoneLabel())}</p><div class="dashboard-upcoming-wrap"><table class="dashboard-upcoming-table"><thead><tr><th>${trText('Date')}</th><th>${trText('Time')}</th><th>${trText('Match')}</th><th>${trText('Teams')}</th><th>${trText('Result')}</th><th>${trText('Venue')}</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  return `<div class="card dashboard-schedule-card"><h3>${trText('Upcoming Matches')}</h3><p class="mut tiny" style="margin-top:-4px">${trText('Matches from today onward')}</p><div class="dashboard-upcoming-wrap"><table class="dashboard-upcoming-table"><thead><tr><th>${trText('Date')}</th><th>${trText('Time')}</th><th>${trText('Match')}</th><th>${trText('Teams')}</th><th>${trText('Result')}</th><th>${trText('Venue')}</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 function dashboardExactScoreLeaders(people){
   return people.map(p=>{
@@ -12451,11 +12459,69 @@ function dashboardBiggestClimbers(){
   const firstPos={}; first.forEach((x,i)=>firstPos[x.id]=i+1);
   return last.map((x,i)=>({name:x.name,from:firstPos[x.id]||last.length,to:i+1,gain:(firstPos[x.id]||last.length)-(i+1)})).sort((a,b)=>b.gain-a.gain||a.to-b.to||a.name.localeCompare(b.name));
 }
+function dashboardScoredPeople(people){
+  // Performance: calculate each player's point details once for the stats page.
+  // Older stats code called ranked()/calcPoints() repeatedly for every checkpoint.
+  return people.map(p=>({person:p,name:p.name,id:p.id,score:calcPoints(p)}));
+}
+function dashboardRankFromDetails(scored,limit){
+  return scored.map(x=>{
+    let total=0;
+    const detail=(x.score&&x.score.detail)||{};
+    LEADERBOARD_MATCHES.forEach(m=>{
+      if(leaderboardPositionForMatch(m)<=limit){
+        const v=Number(detail[m.matchNumber])||0;
+        total+=v;
+      }
+    });
+    return {id:x.id,name:x.name,total};
+  }).sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name));
+}
+function dashboardFirstPlaceTimeFromScores(scored){
+  const counts={}, ids={}, names={};
+  scored.forEach(x=>{ ids[x.id]=x.id; names[x.id]=x.name; });
+  let checkpoints=0;
+  const running=Object.fromEntries(scored.map(x=>[x.id,0]));
+  LEADERBOARD_MATCHES.forEach(match=>{
+    if(!isScoreEntered(state.actual[match.matchNumber]))return;
+    scored.forEach(x=>{ running[x.id]+=(Number(x.score&&x.score.detail&&x.score.detail[match.matchNumber])||0); });
+    const top=scored.map(x=>({id:x.id,name:x.name,total:running[x.id]||0}))
+      .sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name))[0];
+    if(top){counts[top.id]=(counts[top.id]||0)+1;checkpoints++;}
+  });
+  return Object.entries(counts)
+    .map(([id,count])=>({name:names[id]||id,count,checkpoints}))
+    .sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name));
+}
+function dashboardHotStreakRowsFromScores(scored){
+  return scored.map(x=>{
+    let best=0,cur=0;
+    const detail=(x.score&&x.score.detail)||{};
+    LEADERBOARD_MATCHES.forEach(m=>{
+      if(!isScoreEntered(state.actual[m.matchNumber]))return;
+      const pts=Number(detail[m.matchNumber])||0;
+      if(pts>0){cur++;best=Math.max(best,cur);}else cur=0;
+    });
+    return {name:x.name,best};
+  }).sort((a,b)=>b.best-a.best||a.name.localeCompare(b.name));
+}
+function dashboardBiggestClimbersFromScores(scored){
+  const completed=LEADERBOARD_MATCHES.filter(m=>isScoreEntered(state.actual[m.matchNumber]));
+  if(completed.length<2)return [];
+  const firstLimit=leaderboardPositionForMatch(completed[0]);
+  const lastLimit=leaderboardPositionForMatch(completed[completed.length-1]);
+  const first=dashboardRankFromDetails(scored,firstLimit);
+  const last=dashboardRankFromDetails(scored,lastLimit);
+  const firstPos={}; first.forEach((x,i)=>firstPos[x.id]=i+1);
+  return last.map((x,i)=>({name:x.name,from:firstPos[x.id]||last.length,to:i+1,gain:(firstPos[x.id]||last.length)-(i+1)}))
+    .sort((a,b)=>b.gain-a.gain||a.to-b.to||a.name.localeCompare(b.name));
+}
 function dashboard(){
   const people=visiblePeople();
+  const scored=dashboardScoredPeople(people);
   const done=TOURNAMENT.matches.filter(m=>isScoreEntered(state.actual[m.matchNumber])).length;
   const remaining=TOURNAMENT.matches.length-done;
-  const r=ranked();
+  const r=scored.map(x=>({name:x.name,id:x.id,...x.score})).sort((a,b)=>b.total-a.total||a.name.localeCompare(b.name));
   const leader=r[0]||null;
   const second=r[1]||null;
   const leadMargin=leader&&second?leader.total-second.total:0;
@@ -12465,11 +12531,12 @@ function dashboard(){
   let biggest={name:'None',match:null,pts:0,pred:'',winner:''};
   let upsets=[];
   const champCounts={};
-  people.forEach(p=>{
+  scored.forEach(sp=>{
+    const p=sp.person;
     const cp=championPickID(p);
     const cn=(teamById[cp]&&teamById[cp].name)||'No champion';
     champCounts[cn]=(champCounts[cn]||0)+1;
-    const points=calcPoints(p);
+    const points=sp.score||{};
     TOURNAMENT.matches.forEach(m=>{
       const pts=(points.detail&&points.detail[m.matchNumber])||0;
       if(pts>biggest.pts){biggest={name:p.name,match:m.matchNumber,pts,pred:predictionForMatch(m,p),winner:winnerName(m,p.id)||''};}
@@ -12479,12 +12546,12 @@ function dashboard(){
   const exactLeader=exactLeaders[0]||null;
   const exactMatches=exactLeader&&exactLeader.matches.length?exactLeader.matches.map(x=>`<tr><td>#${x.match}</td><td>${esc(x.teams)}</td><td><b>${esc(x.score)}</b></td></tr>`).join(''):`<tr><td colspan="3" class="mut">No exact scores yet.</td></tr>`;
   const exactAllRows=exactLeaders.length?exactLeaders.map((x,i)=>{const list=x.matches.length?x.matches.map(m=>`#${m.match} ${esc(m.score)}`).join(', '):'<span class="mut">None yet</span>';return `<tr><td>${i+1}</td><td><b>${esc(x.name)}</b></td><td>${x.exact}</td><td class="tiny" style="white-space:normal;word-break:break-word;overflow-wrap:anywhere">${list}</td></tr>`;}).join(''):`<tr><td colspan="4" class="mut">No exact scores yet.</td></tr>`;
-  const firstPlace=dashboardFirstPlaceTime();
+  const firstPlace=dashboardFirstPlaceTimeFromScores(scored);
   const firstPlaceRows=firstPlace.length?firstPlace.map((x,i)=>`<tr class="${i===0?'rank-gold':''}"><td>${i+1}</td><td><b>${esc(x.name)}</b></td><td><b>${x.count}</b><div class="tiny mut">of ${x.checkpoints} checkpoints</div></td></tr>`).join(''):`<tr><td colspan="3" class="mut">No completed match checkpoints yet.</td></tr>`;
   const winnerRows=dashboardWinnerAccuracyRows(people);
   const closeRows=dashboardClosestScoreRows(people);
-  const streakRows=dashboardHotStreakRows(people);
-  const climberRows=dashboardBiggestClimbers();
+  const streakRows=dashboardHotStreakRowsFromScores(scored);
+  const climberRows=dashboardBiggestClimbersFromScores(scored);
   const champRows=Object.entries(champCounts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
   TOURNAMENT.matches.forEach(m=>{
     if(!isScoreEntered(state.actual[m.matchNumber]))return;
@@ -13072,6 +13139,22 @@ function leaderboard(){
   state.reveal={match:lim};
   return `<div class="card leaderboard-tools-card"><div class="row"><button type="button" class="leaderboard-stats-button" data-tab="dashboard">📊 Stats</button><span class="spacer"></span><button type="button" data-action="reveal-reset">${trText('Match 1')}</button><button type="button" data-action="reveal-prev">${trText('Previous')}</button><input id="leaderSlider" type="range" min="1" max="104" value="${lim}" data-reveal-match style="flex:1;min-width:260px"><button type="button" class="primary" data-action="reveal-next">${trText('Next')}</button><button type="button" data-action="reveal-live">${trText('Current Match')}</button><span id="leaderPill" class="pill">${trText('Through match')} ${lim}/104</span></div></div><div id="leader-dynamic">${leaderDynamic(lim)}</div>`;
 }
+
+function leaderboardDateTimeText(match){
+  try{
+    if(!match)return '';
+    const d=(typeof dashboardMatchDate==='function')?dashboardMatchDate(match):null;
+    if(!d)return match.dateText?String(match.dateText):'';
+    const locale=(typeof dashboardScheduleLocale==='function')?dashboardScheduleLocale():'en-CA';
+    const tz=(typeof dashboardScheduleTimeZone==='function')?dashboardScheduleTimeZone():'America/Vancouver';
+    const date=new Intl.DateTimeFormat(locale,{timeZone:tz,weekday:'short',month:'short',day:'numeric'}).format(d).replace(/\./g,'');
+    const time=new Intl.DateTimeFormat(locale,{timeZone:tz,hour:'numeric',minute:'2-digit',hour12:true}).format(d).replace(/\s/g,' ');
+    return `${date} · ${time}`;
+  }catch(e){
+    return match&&match.dateText?String(match.dateText):'';
+  }
+}
+
 function leaderDynamic(rawLim){
   const position=clampMatchNo(rawLim);
   const rankedPeople=ranked(position);
@@ -13081,7 +13164,8 @@ function leaderDynamic(rawLim){
   const team1=current?teamName(current.team1Ref,'actual'):'';
   const team2=current?teamName(current.team2Ref,'actual'):'';
   const winner=current?winnerName(current,'actual'):'';
-  const score=isScoreEntered(actual)?`${actual.s1} - ${actual.s2}`:(winner?`${winner} wins`:'No result entered yet');
+  const score=isScoreEntered(actual)?`${actual.s1} - ${actual.s2}`:(winner?`${winner} wins`:'- -');
+  const matchDateTime=current?leaderboardDateTimeText(current):'';
   const isGroup=!!(current&&current.stage==='group');
   const isAdjustedDisplayRange=!!(current&&current.stage==='group'&&originalMatchNo<=24);
 
@@ -13147,6 +13231,7 @@ function leaderDynamic(rawLim){
     <div class="current-match">
       <div class="sideTeam current-team-one"><span class="flag">${flag(team1)}</span><span>${esc(team1)}</span></div>
       <div class="current-score-centre">
+        ${matchDateTime?`<div class="tiny mut current-match-datetime">${esc(matchDateTime)}</div>`:''}
         <div class="scorebig">${esc(score)}</div>
         <div class="tiny mut current-match-meta">#${originalMatchNo} · ${esc(STAGE_LABEL[current&&current.stage]||'')} ${winner?`· Winner: ${esc(winner)}`:''}</div>
       </div>
